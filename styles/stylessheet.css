@@ -1,0 +1,21 @@
+.navbar,.form{
+    background-color: #F2F2F2;
+    
+  }
+  
+.carousel {
+    margin: 10px; 
+    /* background-position: 50%; */
+    
+  }
+
+a{
+    color: blue;
+}
+
+.form{
+  margin: 20px;
+  padding: 20px;
+  background-color: #F2F2F2;
+  
+}

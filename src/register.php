@@ -1,139 +1,71 @@
-<?php 
-include 'connect.php';
+<?php
+include 'connect.php'; // Assuming 'connect.php' establishes the database connection
 
-$name = $email = $DOB = $tel = $pwd = $cpwd = $pass = $name_error =  $email_error =  $DOB_error =  $tel_error =  $pwd_error =  $cpwd_error = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Initialize variables and error flags
+  $name = $_POST['name'];
+  $DOB = $_POST['DOB'];
+  $email = $_POST['email'];
+  $tel = $_POST['tel'];
+  $pwd = $_POST['pwd'];
+  $cpwd = $_POST['cpwd'];
 
+  $hasError = false; // Flag to track validation errors
 
-// trimming and storing data from input fields
-function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
+  // Validation checks
+  if (empty($name)) {
+    $hasError = true;
+    $errorMessage['name'] = 'Please enter your name.';
+  }
+
+  if (empty($DOB)) {
+    $hasError = true;
+    $errorMessage['DOB'] = 'Please enter your date of birth.';
+  }
+
+  // Add more validation checks as needed
+  // - Email format validation (e.g., using filter_var() with FILTER_VALIDATE_EMAIL)
+  // - Minimum password length check (adjust as needed)
+
+  // Password confirmation check
+  if ($pwd !== $cpwd) {  // Use != for inequality comparison
+    $hasError = true;
+    $errorMessage['cpwd'] = 'Passwords do not match.';
+  }
+
+  // Process data if no errors
+  if (!$hasError) {
+    $stmt = $conn->prepare("INSERT INTO voters (names, date_of_birth, email, passwords) VALUES (?, ?, ?, ?)");
+
+    // Check for connection errors
+    if ($conn->connect_error) {
+      echo "Connection failed: " . $conn->connect_error;
+      exit(); // Stop script execution
+    }
+
+    if ($stmt === false) {
+      echo "Error: Could not prepare statement (" . $conn->error . ")";
+      exit(); // Stop script execution on prepare error
+    }
+
+    $stmt->bind_param("ssss", $name, $DOB, $email, password_hash($pwd, PASSWORD_DEFAULT));
+
+    if ($stmt->execute()) {
+      header("Location: login.php");
+    } else {
+      echo "Error: " . $conn->error; // Display error message for debugging
+    }
+
+    $stmt->close(); // Close the prepared statement
+  } else {
+    // Send error messages back to JavaScript (optional)
+    echo json_encode($errorMessage); // Send errors as JSON
+  }
+
+  $conn->close(); // Close the database connection
+} else {
+  echo 'Invalid request method.';
 }
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (empty($_POST["name"])) {
-        $name_error = "Name is required";
-    } else {
-      $name = test_input($_POST["name"]);
-    }
-  
-    if (empty($_POST["email"])) {
-        $email_error = "Email is required";
-    } else {
-      $email = test_input($_POST["email"]);
-    }
-  
-    if (empty($_POST["DOB"])) {
-        $DOB_error = "Date of birth is required";
-    } else {
-      $DOB = test_input($_POST["DOB"]);
-    }
-  
-    if (empty($_POST["tel"])) {
-        $tel_error = "Contact is required";
-    } else {
-      $tel = test_input($_POST["tel"]);
-    }
-  
-    if (empty($_POST["pwd"])) {
-        $pwd_error = "Pasword is required";
-    } else {
-        $pwd = test_input($_POST["pwd"]);
-    }
-
-    if (empty($_POST["cpwd"])) {
-        $cpwd_error = "Paswords don't match";
-    } else {
-        $cpwd = test_input($_POST["cpwd"]);
-        if($pwd != $cpwd){
-            $cpwd_error = "Paswords don't match"; 
-        }else{
-            $pass = $pwd;
-        }
-    }
-}
-// insertion into the database
-
-
-$sql = "INSERT INTO voters (names,date_of_birth,email,mobile_no,passwords) VALUES ('$name','$DOB','$email','$tel','$pass')";
-
-if ($conn->query($sql) === TRUE) {
-    echo "New record created successfully";
-}
-mysqli_close($conn);
 ?>
 
 
-<style>
-  html, body {
-    display: flex;
-    justify-content: center;
-    align-items: center;  
-    padding: 20px;
-    background-image: linear-gradient(to right, #ffffff 50%, #F2F2F2 50%);
-  }
-  img{
-    height: 110%;
-    width: 80%;
-
-  }
-</style>
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><!--enables responsiveness of the site o any device-->
-    <link rel="stylesheet" href="../stylessheet.css">
-    <link rel="stylesheet" href="../bootstrap-5.3.3-dist/css/bootstrap.min.css">
-    <script src="../bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
-    <title>ThumCast</title>
-</head>
-<body>
-    <div class="row">
-        <div class="col-md-6">
-            <img src="../Resources/Register.png" alt="Image 4" >
-        </div>
-        <div class="col-md-6">
-            <form action="" method="post">
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
-                    <span class="error"> <?php echo $name_error;?></span>
-                </div>
-                <div class="form-group">
-                    <label for="DOB">Date of Birth:</label>
-                    <input type="date" class="form-control" id="DOB" placeholder="Enter date of birth" name="DOB">
-                            <span class="error"> <?php echo $DOB_error;?></span>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
-                    <span class="error"> <?php echo $email_error;?></span>
-                </div>
-                <div class="form-group">
-                    <label for="contact">Contact No:</label>
-                    <input type="text" class="form-control" id="tel" placeholder="Enter contact number" name="tel">
-                            <span class="error"> <?php echo $tel_error;?></span>
-                </div>
-                <div class="form-group">
-                    <label for="pwd">Password:</label>
-                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd">
-                    <span class="error"> <?php echo $pwd_error;?></span>
-                </div>
-                <div class="form-group">
-                    <label for="cpwd">Confirm Password:</label>
-                    <input type="password" class="form-control" id="cpwd" placeholder="Confirm password" name="cpwd">
-                    <span class="error"> <?php echo $cpwd_error;?></span>
-                </div>
-                <h6>Already registerred?<a href="login.php"> LogIn</a></h6>
-                <button type="submit" class="btn btn-default">Submit</button>
-            </form>
-        </div>
-    </div>
-</body>
-</html>

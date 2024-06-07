@@ -1,0 +1,49 @@
+.navbar{
+  background-color: #F2F2F2;
+    
+  }
+  
+.carousel {
+    margin: 10px; 
+    align-self: ; 
+  }
+
+a{
+    color: blue;
+}
+
+.form{
+  margin: 20px;
+  padding: 20px;
+  background-color: #F2F2F2;
+  
+}
+.body {
+  
+  background-image: linear-gradient(to right, #ffffff 50%, #F2F2F2 50%);
+}
+#f-img{
+  height: 100%;
+  width: 70%;
+  margin-left: 15%;
+  margin-top: 30px;
+}
+.form-container {
+  /* display: flex; */
+  justify-content: center;
+  align-items: center;
+  margin: 10%;
+  padding: 40px;
+  border: 1px solid skyblue;
+  box-shadow: 5px 0px 5px rgba(0, 132, 255, 0.9);
+  background-color: #F2F2F2;
+}
+.modal-body{
+  background-image: url("../Resources/Register.png");
+  background-repeat: no-repeat;
+}
+#submit{
+  margin: auto;
+}
+
+
